@@ -1,0 +1,373 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+
+    <title>Elijahs Milk Tracker</title>
+    <meta name="description" content="The HTML5 Herald">
+    <meta name="author" content="SitePoint">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
+
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(function () {
+            $("#datepicker").datepicker();
+        });
+    </script>
+
+
+</head>
+
+<body>
+<div class="container-fluid text-center center_div">
+    <div class="row">
+        <div class="col-12">
+            <h1>Total Fed: {{ total }} ml</h1>
+            <img class="mx-auto d-block mb-5" src="../static/elijah1.jpg" alt="">
+        </div>
+    </div>
+    <div class="row align-content-center text-center">
+
+        <div class="col-12 text-center">
+
+            <h1 class="mb-5">Elijahs Feeding Log</h1>
+
+            <ul class="list-group text-center">
+
+
+                <table class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Amount Fed</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for log in logs %}
+                        <tr>
+                            <td><span id="{{ log._id['$oid'] }}_DATESTR">{{ log.dateStr }}</span></td>
+                            <td><span id="{{ log._id['$oid'] }}_TIMESTR">{{ log.timeStr }}</span></td>
+                            <td><span id="{{ log._id['$oid'] }}_MILKUSED">{{ log.milkUsed }} ml</span></td>
+                            <td>
+                                <button class="btn btn-danger" onclick="deleteItem('{{ log._id['$oid'] }}')">Delete
+                                </button>
+                                <button id="{{ log._id['$oid'] }}_EDITBTN" class="btn btn-secondary"
+                                        onclick="editItem('{{ log._id['$oid'] }}')">Edit
+                                </button>
+                                <button style="display: none" id="{{ log._id['$oid'] }}_SAVE" class="btn btn-secondary"
+                                        onclick="click_edit('{{ log._id['$oid'] }}')">Save
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+
+
+            </ul>
+
+
+        </div>
+    </div>
+    <div class="row  mt-5">
+        <div class="col-12">
+
+            <form class="" action="{{ url_for('log_milk') }}" method="post">
+                <div class="form-group">
+                    <label for="milk_amount">Enter Amount</label>
+                    <input class="form-control" id="milk_amount" name="milk_amount" type="number" placeholder="ML">
+                </div>
+
+                <button class="btn btn-primary" type="submit">Log</button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .center_div {
+        margin: 0 auto;
+        width: 80% /* value of your choice which suits your alignment */
+    }
+
+    table, label {
+        font-size: 30px;
+    }
+
+    img {
+        width: 400px;
+        height: 400px;
+        border-radius: 50%;
+    }
+
+</style>
+
+<script>
+    function newLog(value) {
+
+    }
+
+    function getLogs() {
+        $.ajax({
+            "url": "/api/v1/logs",
+            data: JSON.stringify({id: id_}),
+            contentType: 'application/json',
+            method: 'GET',
+            statusCode: {
+                200: function (response) {
+                    window.location.replace("/")
+
+                },
+                201: function (response) {
+
+                },
+
+                400: function (response) {
+
+                },
+                404: function (response) {
+
+                },
+
+                417: function (response) {
+                    alert("Error Processing Request")
+                },
+                500: function (response) {
+
+                }
+            }
+        })
+
+    }
+
+    function deleteItem(id_) {
+        console.log(id_)
+
+
+        resp = confirm("Are You Sure You Want to Delete This Log?")
+
+        if (resp === true) {
+
+            $.ajax({
+                "url": "/delete_log",
+                data: JSON.stringify({id: id_}),
+                contentType: 'application/json',
+                method: 'POST',
+                statusCode: {
+                    200: function (response) {
+                        window.location.replace("/")
+
+                    },
+                    201: function (response) {
+
+                    },
+
+                    400: function (response) {
+
+                    },
+                    404: function (response) {
+
+                    },
+
+                    417: function (response) {
+                        alert("Error Processing Request")
+                    },
+                    500: function (response) {
+
+                    }
+                }
+            })
+
+
+        } else {
+            location.reload();
+        }
+
+
+    }
+
+    function editItem(id_) {
+        let date_id_str = `${id_}_DATESTR`
+        let time_id_str = `${id_}_TIMESTR`
+        let milk_id_str = `${id_}_MILKUSED`
+        let edt_btn_str = `${id_}_EDITBTN`
+        let save_btn_str = `${id_}_SAVE`
+
+        let DATE_FIELD = $(`#${date_id_str}`)
+        let TIME_FIELD = $(`#${time_id_str}`)
+        let MILK_USED_FIELD = $(`#${milk_id_str}`)
+        let EDIT_BUTTON = $(`#${edt_btn_str}`)
+        let SAVE_BUTTON = $(`#${save_btn_str}`)
+
+        let old_milk_val = MILK_USED_FIELD.html()
+        let old_time_val = TIME_FIELD.html()
+
+        DATE_FIELD.replaceWith(
+            `
+
+            <input class="form-control" type="date" id=${id_}_DATE>
+
+            `
+        )
+
+        TIME_FIELD.replaceWith(
+            `
+            <input class="form-control" type="time" id=${id_}_TIME>
+            `
+        )
+
+        MILK_USED_FIELD.replaceWith(
+            `
+            <input class="form-control" type="text" id=${id_}_FED placeholder=${old_milk_val}>
+            `
+        )
+
+        EDIT_BUTTON.hide()
+        SAVE_BUTTON.show()
+
+
+        {#console.log(id_)#}
+        {#console.log($(`#${date_id_str}`))#}
+    }
+
+    function click_edit(id_) {
+            let request = {}
+
+            let date_id_str = `${id_}_DATE`
+            let time_id_str = `${id_}_TIME`
+            let fed_id_str = `${id_}_FED`
+
+            let old_time_id_str = `${id_}_TIMESTR`
+
+            let OLD_TIME_FIELD = $(`#${old_time_id_str}`)
+
+            let DATE_FIELD = $(`#${date_id_str}`)
+            let TIME_FIELD = $(`#${time_id_str}`)
+            let FED_FIELD = $(`#${fed_id_str}`)
+
+            console.log(TIME_FIELD.val())
+
+            if (DATE_FIELD.val() !== undefined) {
+                request.date = DATE_FIELD.val()
+            }
+            if (TIME_FIELD.val() !== undefined) {
+                request.time = TIME_FIELD.val()
+            } else {
+                request.time = OLD_TIME_FIELD.val()
+            }
+
+
+            if (FED_FIELD.val() !== undefined) {
+                request.fed = FED_FIELD.val()
+            }
+
+            request.id = id_
+
+            sendLogUpdate(request).then(function (response) {
+                window.location.replace("/")
+            })
+
+
+
+
+
+        }
+
+    function sendLogUpdate(request) {
+        return $.ajax({
+            method: 'POST',
+            data: JSON.stringify(request),
+            contentType: 'application/json',
+            "url": '/api/v1/logs',
+            statusCode: {
+                200: function (response) {
+                    return response
+
+                },
+                201: function (response) {
+
+                },
+
+                400: function (response) {
+
+                },
+                404: function (response) {
+
+                },
+
+                417: function (response) {
+                    alert("Error Processing Request")
+                },
+                500: function (response) {
+
+                }
+            }
+        })
+
+    }
+
+    function getEstimatedFeedTime() {
+        return $.ajax({
+            "url": "/api/v1/feed/estimate",
+            method: 'GET',
+            statusCode: {
+                200: function (response) {
+                    return response
+
+                },
+                201: function (response) {
+
+                },
+
+                400: function (response) {
+
+                },
+                404: function (response) {
+
+                },
+
+                417: function (response) {
+                    alert("Error Processing Request")
+                },
+                500: function (response) {
+
+                }
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        console.log("ready!");
+        let feed_time = getEstimatedFeedTime()
+
+        feed_time.then(function (resp) {
+            let est_feed_time = resp.estimated_feeding_time
+
+            $('#EST_FEED_TIME').html(est_feed_time)
+
+        })
+
+
+    });
+
+</script>
+</body>
+</html>

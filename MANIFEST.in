@@ -1,0 +1,3 @@
+include requirements.txt
+include baby_log/static/*
+include baby_log/templates/*

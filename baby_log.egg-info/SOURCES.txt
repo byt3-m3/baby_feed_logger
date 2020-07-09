@@ -1,0 +1,13 @@
+MANIFEST.in
+README.md
+requirements.txt
+setup.py
+baby_log/__init__.py
+baby_log/__main__.py
+baby_log/core.py
+baby_log.egg-info/PKG-INFO
+baby_log.egg-info/SOURCES.txt
+baby_log.egg-info/dependency_links.txt
+baby_log.egg-info/top_level.txt
+baby_log/static/elijah1.jpg
+baby_log/templates/index.j2
