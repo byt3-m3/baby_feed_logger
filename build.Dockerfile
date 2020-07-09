@@ -1,23 +1,37 @@
-# ------ Build Core & requirements ------
-FROM ubuntu AS build
+# ---- Dependencies ----
+FROM python:3.7-slim AS core
 
-WORKDIR /build
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends build-essential gcc
 
-RUN apt-get update && apt-get install -y python3-pip
+RUN python -m venv /opt/venv
 
-COPY requirements.txt ./
+# Make sure we use the virtualenv:
+ENV PATH="/opt/venv/bin:$PATH"
 
-RUN pip3 install -r requirements.txt
+COPY requirements.txt /
+RUN pip install -r /requirements.txt
 
-# ------ Build Release ------
-FROM build AS release
+WORKDIR /baby_log
 
-WORKDIR /build
+COPY . /baby_log
 
-COPY dist/ ./
+RUN python3 setup.py sdist
 
-RUN ls | grep tar.gz | xargs pip3 install
+# ---- Copy Files/Build ----
+FROM python:3.7-slim AS build
+
+COPY --from=core /baby_log /
+COPY --from=core /opt/venv /opt/venv
+
+# Make sure we use the virtualenv:
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN cd dist && ls | grep tar.gz | xargs pip3 install
 
 ENTRYPOINT  ["python3", "-m","baby_log"]
 
 CMD ["--run"]
+
+
+
