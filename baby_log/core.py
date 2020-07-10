@@ -1,22 +1,18 @@
 from flask import Flask, jsonify, render_template, request, url_for, redirect, Response
-import re
-import os
-import sys
 import mongoengine
 import datetime
-import time
 import bson
 import json
-from marshmallow import Schema, fields
-import requests
+
+
 
 app = Flask(__name__)
 
 JSON_RESPONSE_HEADERS = {'content-type': 'application/json; charset=utf-8'}
 
 
-def connect_mongoengine():
-    mongoengine.connect("milk_log_dev", host="192.168.1.182", port=27017)
+def connect_mongoengine(host, port):
+    mongoengine.connect("milk_log_dev", host=host, port=port)
 
 
 class Log(mongoengine.Document):

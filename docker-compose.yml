@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  db:
+    image: mongo
+    ports:
+      - 27017:27017
+
+  app:
+    image: cbaxter1988/baby_log
+    ports:
+      - 80:80
+    environment:
+      - MONGO_DB_HOST=db
+      - MONGO_DB_PORT=27017
+      

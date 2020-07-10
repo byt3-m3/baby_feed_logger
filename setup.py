@@ -8,4 +8,5 @@ setup(
     author='Courtney S Baxter Jr',
     author_email='cbaxtertech@gmail.com',
     packages=find_packages(),
+    include_package_data=True
 )

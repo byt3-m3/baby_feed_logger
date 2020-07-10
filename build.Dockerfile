@@ -1,27 +1,21 @@
 # ---- Dependencies ----
 FROM python:3.7-slim AS core
 
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends build-essential gcc
-
+# Creates and Make sure we use the virtualenv:
 RUN python -m venv /opt/venv
-
-# Make sure we use the virtualenv:
 ENV PATH="/opt/venv/bin:$PATH"
 
+# ---- Compiles Python Distro ----
+COPY dist/ /dist
+
 COPY requirements.txt /
-RUN pip install -r /requirements.txt
 
-WORKDIR /baby_log
-
-COPY . /baby_log
-
-RUN python3 setup.py sdist
+RUN pip install -r requirements.txt
 
 # ---- Copy Files/Build ----
 FROM python:3.7-slim AS build
 
-COPY --from=core /baby_log /
+COPY --from=core /dist /dist
 COPY --from=core /opt/venv /opt/venv
 
 # Make sure we use the virtualenv:
